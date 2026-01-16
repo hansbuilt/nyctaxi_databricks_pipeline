@@ -1,0 +1,5 @@
+#BASE_PATH = "/dbfs/FileStore/nyc_taxi"
+BASE_PATH = "/Volumes/nyc_project"
+BRONZE_PATH = f"{BASE_PATH}/bronze"
+SILVER_PATH = f"{BASE_PATH}/silver"
+GOLD_PATH = f"{BASE_PATH}/gold"

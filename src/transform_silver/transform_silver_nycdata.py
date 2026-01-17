@@ -41,6 +41,12 @@ def transform_silver_yellow_nyctaxi(spark, bronze_base_path, silver_base_path):
         )
     )
 
+    #adding trip duration in silver as it's row based, not filtering on it for now
+    silver_clean = silver_clean.withColumn(
+        "trip_duration_seconds",
+        col("dropoff_ts").cast("long") - col("pickup_ts").cast("long")
+    )
+
     #dedup rows, as we may be reloading the same files from time to time
 
     #build natural key cols, as we don't have a UID for each trip
@@ -120,6 +126,12 @@ def transform_silver_green_nyctaxi(spark, bronze_base_path, silver_base_path):
             col("year").cast('int'),
             col("month").cast('int')
         )
+    )
+
+    #adding trip duration in silver as it's row based, not filtering on it for now
+    silver_clean = silver_clean.withColumn(
+        "trip_duration_seconds",
+        col("dropoff_ts").cast("long") - col("pickup_ts").cast("long")
     )
 
     #dedup rows, as we may be reloading the same files from time to time

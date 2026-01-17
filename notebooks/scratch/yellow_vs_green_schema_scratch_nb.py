@@ -1,9 +1,11 @@
 # Databricks notebook source
+#test
 yellow_path = "/Volumes/nyc_project/bronze/yellow/"
 green_path = "/Volumes/nyc_project/bronze/green/"
 
 yellow = spark.read.parquet(yellow_path)
 green = spark.read.parquet(green_path)
+
 
 # COMMAND ----------
 
@@ -53,3 +55,14 @@ print(unique)
 
 #yellow only: airport_fee
 #green only: ehail_fee, trip_type
+
+# COMMAND ----------
+
+from pyspark.sql import functions as F
+
+testdf = syellow.withColumn(
+    "trip_duration_seconds",
+    F.col("dropoff_ts").cast("long") - F.col("pickup_ts").cast("long")
+)
+
+testdf.printSchema()

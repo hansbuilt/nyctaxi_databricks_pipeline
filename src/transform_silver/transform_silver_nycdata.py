@@ -172,3 +172,34 @@ def transform_silver_green_nyctaxi(spark, bronze_base_path, silver_base_path):
         .partitionBy('year', 'month')
         .parquet(silver_path)
     )
+
+def transform_silver_zonelookup(spark, bronze_base_path, silver_base_path):
+    """
+    Transforms bronze zone lookup data to silver zone lookup data.
+    """
+
+    bronze_path = f"{bronze_base_path}/zone_lookup"
+    silver_path = f"{silver_base_path}/zone_lookup"
+
+    bronze_df = spark.read.parquet(bronze_path)
+
+    #rename cols to set them all to snake case, cast datatypes explicitly
+    silver_clean = (
+        bronze_df
+        .select(
+            col("LocationID").alias('location_id').cast('int'),
+            col("Borough").alias('borough').cast('string'),
+            col("Zone").alias('zone').cast('string'),
+            col("service_zone").cast('string'),
+            col("ingestion_ts").cast('timestamp')
+        )
+    )
+
+    #write to silver
+
+    (
+        silver_clean
+        .write
+        .mode('overwrite')
+        .parquet(silver_path)
+    )

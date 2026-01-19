@@ -14,7 +14,7 @@ from pathlib import Path
 repo_root = str(Path().resolve().parents[0])  #relative path so we don't expose email / username
 sys.path.append(f"{repo_root}/src")
 
-from transform_gold.transform_gold_nycdata import transform_gold_consolidated_base, transform_gold_trip_revenue_daily_fact
+from transform_gold.transform_gold_nycdata import transform_gold_consolidated_base, transform_gold_trip_revenue_daily_fact, transform_gold_zonelookup_dim, transform_gold_trip_demand_fact
 
 silver_base_path = "/Volumes/nyc_project/silver/"
 gold_base_path = "/Volumes/nyc_project/gold/"
@@ -23,6 +23,11 @@ gold_consol_base_path = "/Volumes/nyc_project/gold/gold_consolidated_trips_base/
 transform_gold_consolidated_base(spark, silver_base_path, gold_base_path)
 
 transform_gold_trip_revenue_daily_fact(spark, gold_consol_base_path, gold_base_path)
+
+transform_gold_zonelookup_dim(spark, silver_base_path, gold_base_path)
+
+transform_gold_trip_demand_fact(spark, gold_consol_base_path, gold_base_path)
+
 
 # COMMAND ----------
 
@@ -39,3 +44,5 @@ df.write.mode("overwrite").saveAsTable("gold_consolidated_trips_base_fact")
 
 # display table
 display(spark.table("gold_consolidated_trips_base_fact"))
+
+print(df.columns)

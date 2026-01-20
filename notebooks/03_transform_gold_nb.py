@@ -33,16 +33,28 @@ transform_gold_trip_demand_fact(spark, gold_consol_base_path, gold_base_path)
 
 # DBTITLE 1,Write Parquet to Managed Table
 # read parquet
-parquet_path = "/Volumes/nyc_project/gold/gold_consolidated_trips_base"
-df = spark.read.parquet(parquet_path)
+triprev_path = "/Volumes/nyc_project/gold/gold_trip_revenue_daily_fact"
+df = spark.read.parquet(triprev_path)
 
 # drop table first, in the event we add columns
-spark.sql("DROP TABLE IF EXISTS gold_consolidated_trips_base_fact")
+spark.sql("DROP TABLE IF EXISTS gold_trip_revenue_daily_fact")
 
 # write table
-df.write.mode("overwrite").saveAsTable("gold_consolidated_trips_base_fact")
+df.write.mode("overwrite").saveAsTable("gold_trip_revenue_daily_fact")
 
-# display table
-display(spark.table("gold_consolidated_trips_base_fact"))
+# COMMAND ----------
 
-print(df.columns)
+# read parquet
+tripdem_path = "/Volumes/nyc_project/gold/gold_trip_demand_fact"
+df = spark.read.parquet(tripdem_path)
+
+# drop table first, in the event we add columns
+spark.sql("DROP TABLE IF EXISTS gold_trip_demand_fact")
+
+# write table
+df.write.mode("overwrite").saveAsTable("gold_trip_demand_fact")
+
+# COMMAND ----------
+
+# MAGIC %md
+# MAGIC

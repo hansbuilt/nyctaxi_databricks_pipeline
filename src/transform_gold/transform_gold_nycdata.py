@@ -2,15 +2,8 @@
 from pyspark.sql import functions as F
 from pyspark.sql.window import Window
 
+
 """
-Goals:
-- consolidated yellow and green datasets
-
-- trip revenue daily fact - trip ct, total rev, total tips, avg fare, avg tip, taxi type
-- trip demand daily fact - hour AND day, zone/location, trip ct, avg distance, avg duration, total dist, total duration, taxi type
-- trip efficiency fact - zone PU and DO pairings, taxi type, avg duration, avg distance, avg speed mph, trip count, hour/date
-- taxi type utilization - PU zone/loc, yellow trip ct, green trip ct, avg fare of each, avg duration of each
-
 """ 
 
 def transform_gold_consolidated_base(spark, silver_base_path, gold_base_path):
@@ -120,14 +113,15 @@ def transform_gold_trip_demand_fact(spark, gold_consol_base_path, gold_base_path
     df_time = (
         df
         .withColumn("pickup_day", F.to_date("pickup_ts"))
-        .withColumn("pickup_hour", F.hour("pickup_ts"))
+        .withColumn("pickup_hour", F.hour("pickup_ts"))                    
+        .withColumn("pickup_weekday_iso", F.date_format("pickup_ts", "u").cast("int"))
     )
 
     #removing averages given a ton of groupby levels here
 
     df_agg = (
         df_time
-        .groupBy("pickup_day", 'pickup_hour', 'taxi_type', 'pu_location_id', 'do_location_id')
+        .groupBy("pickup_day", 'pickup_hour', 'pickup_weekday_iso', 'taxi_type', 'pu_location_id', 'do_location_id')
         .agg(F.count("*").alias('trip_count'),
             (F.sum('trip_distance').alias('total_trip_distance')),
             #(F.avg('trip_distance').alias('avg_trip_distance')),
@@ -178,7 +172,7 @@ def transform_gold_trip_demand_fact(spark, gold_consol_base_path, gold_base_path
         df_joined
         .write
         .mode('overwrite')
-        .partitionBy("pickup_day", 'pickup_hour')
+        .partitionBy("pickup_day")
         .parquet(gold_path)
     )
     

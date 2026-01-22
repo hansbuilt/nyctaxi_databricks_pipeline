@@ -14,6 +14,8 @@ from pathlib import Path
 repo_root = str(Path().resolve().parents[0])  #relative path so we don't expose email / username
 sys.path.append(f"{repo_root}/src")
 
+spark.conf.set("spark.sql.legacy.timeParserPolicy", "LEGACY")  #needed for iso day of week formatting
+
 from transform_gold.transform_gold_nycdata import transform_gold_consolidated_base, transform_gold_trip_revenue_daily_fact, transform_gold_zonelookup_dim, transform_gold_trip_demand_fact
 
 silver_base_path = "/Volumes/nyc_project/silver/"
